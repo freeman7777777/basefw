@@ -1,0 +1,53 @@
+<!DOCTYPE HTML>
+<html lang="en"
+      xmlns:th="http://www.thymeleaf.org">
+<head th:include="console/header">
+</head>
+<style type="text/css">
+</style>
+<body>
+<section class="content-header toolbar-before-margin">
+    <h1>菜单管理</h1>
+</section>
+<section class="content table-content">
+    <a shiro:hasPermission="menu:edit" href="/console/menu/edit" class="btn btn-primary">添加一级菜单</a>
+    <table class="table table-bordered toolbar-after-margin" id="dataGrid">
+        <tr>
+            <th>菜单名称</th>
+            <th>权限标识</th>
+            <th>菜单URL</th>
+            <th>菜单类型</th>
+            <th>排序</th>
+            <th>创建时间</th>
+            <th>更新时间</th>
+            <th>操作</th>
+        </tr>
+        <tr th:id="${menu.menuId}" th:each="menu,menuStat:${menus}" th:class="${#strings.equals(menu.parentId,'0')?'treegrid-'+menu.menuId : 'treegrid-'+menu.menuId+' treegrid-parent-'+menu.parentId} ">
+            <td th:text="${menu.menuName}"></td>
+            <td th:text="${menu.menuCode}"></td>
+            <td th:text="${menu.menuUrl}"></td>
+            <td th:text="${#strings.equals(menu.menuType,'menu') ? '菜单' : (#strings.equals(menu.menuType,'auth') ? '菜单+权限' : '列表/按钮权限')}"></td>
+            <td>
+            	<shiro:hasPermission name="menu:edit">
+            		<input type="text" th:attr="data-id=${menu.menuId}" name="listorder" th:value="${menu.listorder}" size="3" maxlength="3" />
+            	</shiro:hasPermission>
+            	<shiro:lacksPermission name="menu:edit">
+            		<input type="text" th:attr="data-id=${menu.menuId}" name="listorder" th:value="${menu.listorder}" size="3" maxlength="3" disabled="disabled" />
+            	</shiro:lacksPermission>
+           	</td>
+            <td th:text="${menu.createdAt}"></td>
+            <td th:text="${menu.updatedAt}"></td>
+            <td>
+                <a th:if="${menu.menuLevel &lt; 3}" shiro:hasPermission="menu:edit" th:href="${'/console/menu/edit?parentId='+menu.menuId}" ><i class="glyphicon glyphicon-plus"></i>添加子菜单</a>
+                <a shiro:hasPermission="menu:edit" th:href="${'/console/menu/edit?menuId='+menu.menuId}" ><i class="glyphicon glyphicon-edit"></i>修改</a>
+                <a shiro:hasPermission="menu:delete" class="remove" th:attr="data-id=${menu.menuId}" href="javascript:void(0);"><i class="glyphicon glyphicon-remove"></i>删除</a></td>
+        </tr>
+    </table>
+</section>
+
+<div th:include="console/footer"></div>
+
+<script type="text/javascript" src="/static/js/menu.js"></script>
+
+</body>
+</html>
